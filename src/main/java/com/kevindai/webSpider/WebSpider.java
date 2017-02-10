@@ -1,5 +1,6 @@
 package com.kevindai.webSpider;
 
+import com.kevindai.utils.HttpClientsUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -37,43 +38,6 @@ public class WebSpider implements Runnable{
         this.countDownLatch = countDownLatch;
     }
 
-    public  String sendUrl(String url){
-        // 定义一个字符串用来存储网页内容
-        StringBuffer sb = new StringBuffer();
-        // 定义一个缓冲字符输入流
-        BufferedReader in = null;
-        try {
-            // 将string转成url对象
-            URL realUrl = new URL(url);
-            // 初始化一个链接到那个url的连接
-            URLConnection connection = realUrl.openConnection();
-            // 开始实际的连接
-            connection.connect();
-            // 初始化 BufferedReader输入流来读取URL的响应
-            in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-            // 用来临时存储抓取到的每一行的数据
-            String line;
-            while ((line = in.readLine()) != null) {
-                // 遍历抓取到的每一行并将其存储到result里面
-                sb.append(line);
-            }
-        } catch (Exception e) {
-            System.out.println("发送GET请求出现异常！" + e);
-            e.printStackTrace();
-        }
-        // 使用finally来关闭输入流
-        finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
-        return sb.toString();
-    }
-
     public  String regexStr(String targetStr,String regex){
         StringBuilder result = new StringBuilder();
         Pattern pattern = Pattern.compile(regex);;
@@ -83,20 +47,6 @@ public class WebSpider implements Runnable{
         }
 
         return result.toString();
-    }
-
-    public  String httpClientSendUrl(String url){
-        String result = null;
-        try{
-            HttpClient httpClient = HttpClients.createDefault();//初始化一个httpClient链接
-            HttpGet httpGet = new HttpGet(url);//创建一个get请求
-            HttpResponse response = httpClient.execute(httpGet);//获取请求的返回值
-            HttpEntity entity = response.getEntity();//得到请求返回值的数据
-            result = EntityUtils.toString(entity);//格式化结果
-        }catch (Exception e){
-            System.out.println("httpClientSend请求异常");
-        }
-        return result;
     }
 
     public String httpClientPostUrl(String url,int offset,int pageSize) {
@@ -145,7 +95,7 @@ public class WebSpider implements Runnable{
         String url = this.url;
 
         //用于获取当前问题下总共有多少回答
-        String content = httpClientSendUrl(url);//得到当前问题返回数据
+        String content = HttpClientsUtils.httpClientSendUrl(url);//得到当前问题返回数据
         //获取答案总数
         String total = regexStr(content,"id=\"zh-question-answer-num\">([0-9]{1,}.+?).+?");
         total = total.substring(0,total.indexOf(",")).trim();
