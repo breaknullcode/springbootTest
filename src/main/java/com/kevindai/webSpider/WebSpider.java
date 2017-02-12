@@ -38,17 +38,6 @@ public class WebSpider implements Runnable{
         this.countDownLatch = countDownLatch;
     }
 
-    public  String regexStr(String targetStr,String regex){
-        StringBuilder result = new StringBuilder();
-        Pattern pattern = Pattern.compile(regex);;
-        Matcher matcher = pattern.matcher(targetStr);
-        while (matcher.find()){
-            result.append(matcher.group(1)).append(",");
-        }
-
-        return result.toString();
-    }
-
     public String httpClientPostUrl(String url,int offset,int pageSize) {
         String result = null;
         try {
@@ -97,10 +86,10 @@ public class WebSpider implements Runnable{
         //用于获取当前问题下总共有多少回答
         String content = HttpClientsUtils.httpClientSendUrl(url);//得到当前问题返回数据
         //获取答案总数
-        String total = regexStr(content,"id=\"zh-question-answer-num\">([0-9]{1,}.+?).+?");
+        String total = HttpClientsUtils.regexStr(content,"id=\"zh-question-answer-num\">([0-9]{1,}.+?).+?");
         total = total.substring(0,total.indexOf(",")).trim();
         //获取问题名,为方便建文件夹
-        String title = regexStr(content,"class=\"zm-editable-content\">(.*).+?</span>");
+        String title = HttpClientsUtils.regexStr(content,"class=\"zm-editable-content\">(.*).+?</span>");
         title = title.substring(0,title.indexOf(",")).trim();
         File dir = new File("D:" + File.separator + title);
         if(!dir.exists()){
@@ -115,7 +104,7 @@ public class WebSpider implements Runnable{
         for (int i = 0; i < count ; i++) {
             result = httpClientPostUrl(url,pageSize * i,pageSize);
             //获取图片url
-            result = regexStr(result,"</noscript><img.+?src=\"(https.+?)\".+?");
+            result = HttpClientsUtils.regexStr(result,"</noscript><img.+?src=\"(https.+?)\".+?");
             List<String> zhihuPicUrls = Arrays.asList(result.split(","));
             for (String picUrl : zhihuPicUrls) {
                     //通过url获取图片

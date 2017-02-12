@@ -7,6 +7,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Created by kevindai on 2017/2/10.
  */
@@ -31,4 +34,28 @@ public class HttpClientsUtils {
         return result;
     }
 
+    /**
+     * 正则表达式匹配第二个括号内的内容,以","分割
+     * @param targetStr
+     * @param regex
+     * @return
+     */
+    public static String regexStr(String targetStr,String regex){
+        StringBuilder result = new StringBuilder();
+        Pattern pattern = Pattern.compile(regex);;
+        Matcher matcher = pattern.matcher(targetStr);
+        while (matcher.find()){
+            result.append(matcher.group(1)).append(",");
+        }
+
+        return result.toString();
+    }
+
+    public static void main(String[] args) {
+        String str = "\n" +
+                "                        翠苑东二区二手房,\n" +
+                "                        古荡新村西二手房,\n" +
+                "                        新世纪花苑二手房,";
+        System.out.println(str.replace("\n","").replace(" ",""));
+    }
 }

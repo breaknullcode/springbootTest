@@ -76,9 +76,17 @@
     initMap();
 
     function searchPOI(){
+        var localtion = "${location}";
+        var locations = localtion.split(",");
+        /*for(var i = 0;i < locations.length;i++){
+            alert(locations[i]);
+        }*/
+
         var localSearch = new BMap.LocalSearch(map);
         localSearch.enableAutoViewport(); //允许自动调节窗体大小
-        var keyword = document.getElementById("searchValue").value;
+        //var keyword = document.getElementById("searchValue").value;
+        var keyword = locations[1];
+        alert(locations[1]);
         localSearch.setSearchCompleteCallback(function (searchResult) {
             var poi = searchResult.getPoi(0);
             document.getElementById("result").value = poi.point.lng + "," + poi.point.lat; //获取经度和纬度，将结果显示在文本框中
