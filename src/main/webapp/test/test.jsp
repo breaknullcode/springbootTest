@@ -72,29 +72,37 @@
         var overviewControl = new BMap.OverviewMapControl({anchor:BMAP_ANCHOR_BOTTOM_RIGHT,isOpen:true});
         map.addControl(overviewControl);
     }
-    var map;
+    var map,myGeo;
     initMap();
+    searchPOI();
 
     function searchPOI(){
-        var localtion = "${location}";
-        var locations = localtion.split(",");
-        /*for(var i = 0;i < locations.length;i++){
-            alert(locations[i]);
-        }*/
-
-        var localSearch = new BMap.LocalSearch(map);
-        localSearch.enableAutoViewport(); //允许自动调节窗体大小
-        //var keyword = document.getElementById("searchValue").value;
-        var keyword = locations[1];
-        alert(locations[1]);
-        localSearch.setSearchCompleteCallback(function (searchResult) {
-            var poi = searchResult.getPoi(0);
-            document.getElementById("result").value = poi.point.lng + "," + poi.point.lat; //获取经度和纬度，将结果显示在文本框中
-            map.centerAndZoom(poi.point, 13);
-            var marker = new BMap.Marker(new BMap.Point(poi.point.lng, poi.point.lat));  // 创建标注，为要查询的地址对应的经纬度
-            map.addOverlay(marker);
-        });
-        localSearch.search(keyword);
+        var houseMsgs = "${houseMsgs}";
+        alert(houseMsgs[2]);
+        var users = JSON.stringify(houseMsgs);
+        alert(users);
+        for( var j = 0;j < users.length;j++){
+            console.log(users[j]);
+        }
+        myGeo = new BMap.Geocoder();
+        for(var i = 0;i < locations.length;i++){
+            var address = locations[i];
+            geocodeSearch(address);
+        }
+    }
+    function geocodeSearch(address){
+        myGeo.getPoint(address, function(point){
+            if (point) {
+                var locpoint = new BMap.Point(point.lng, point.lat);
+                addMarker(locpoint,new BMap.Label(address,{offset:new BMap.Size(20,-10)}));
+            }
+        }, "杭州市");
+    }
+    //创建标注
+    function addMarker(point,label){
+        var marker = new BMap.Marker(point);
+        map.addOverlay(marker);
+        marker.setLabel(label);
     }
 </script>
 </html>
